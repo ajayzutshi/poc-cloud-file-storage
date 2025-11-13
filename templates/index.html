@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud File Storage PoC</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(to right, #00bfa5, #00bcd4);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .upload-container {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: 350px;
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .upload-container h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    input[type="file"] {
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+    .upload-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      width: 85%;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .upload-btn:hover {
+      background: #222;
+    }
+    .file-name {
+      font-size: 0.9rem;
+      color: #f0f0f0;
+      word-break: break-all;
+    }
+    .status {
+      font-size: 0.9rem;
+      margin-top: 5px;
+      min-height: 20px;
+    }
+    footer {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    footer p { margin: 5px 0; }
+    footer span { opacity: 0.8; }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h1>Upload Your File</h1>
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" id="fileInput" name="file" accept=".jpg,.jpeg,.png,.pdf" required>
+      <span class="file-name" id="fileName">No file selected</span>
+      <button type="submit" class="upload-btn">Upload</button>
+      <div class="status" id="statusMsg"></div>
+    </form>
+  </div>
+  <footer>
+    <p>© 2025 Ajay Zutshi — All Rights Reserved</p>
+    <p><span>Proof of Concept Project | Pilot Stage | Under Development</span></p>
+  </footer>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const uploadForm = document.getElementById('uploadForm');
+    const statusMsg = document.getElementById('statusMsg');
+
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files.length > 0
+        ? fileInput.files[0].name
+        : 'No file selected';
+    });
+
+    uploadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(uploadForm);
+      statusMsg.textContent = 'Uploading...';
+      fetch('/upload', { method: 'POST', body: formData })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => {
+          statusMsg.textContent = data.message || '✅ Upload complete!';
+          fileInput.value = '';
+          fileName.textContent = 'No file selected';
+        })
+        .catch(() => {
+          statusMsg.textContent = '❌ Upload failed. Try again.';
+        });
+    });
+  </script>
+</body>
+</html>
+
